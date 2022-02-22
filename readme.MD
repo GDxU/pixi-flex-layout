@@ -7,7 +7,7 @@ Flex layouts for pixi.js (both v6) powered by [Yoga](https://yogalayout.com/)
 # Installation
 
 ```
-npm install pixi-flex-layout --save
+npm install pixi-flex-layout-v6 --save
 ```
 
 # Usage
