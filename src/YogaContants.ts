@@ -9,7 +9,6 @@ export namespace YogaConstants {
         "row-reverse" = yoga.FLEX_DIRECTION_ROW_REVERSE
     }
 
-
     export enum JustifyContent {
         "flex-start" = yoga.JUSTIFY_FLEX_START,
         "flex-end" = yoga.JUSTIFY_FLEX_END,

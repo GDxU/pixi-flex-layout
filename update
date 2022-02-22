@@ -61,7 +61,7 @@ gitpush(){
     git add .
     git commit -m "Please check! $gitcheck"
     git push
-    echo "♻️ You can open ${GIT_LOC} or git clone ${GIT_LOC}.git to copy to the local"
+    echo "♻️ You can open ${GIT_LOC} or git clone ${GIT_LOC} to copy to the local"
 }
 
 taobao(){

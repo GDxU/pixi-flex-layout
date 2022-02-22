@@ -1,0 +1,1 @@
+{"version":3,"file":"YogaLayoutConfig.js","sourceRoot":"","sources":["YogaLayoutConfig.ts"],"names":[],"mappings":"","sourcesContent":["import { YogaLayout } from \"./YogaLayout\";\n\nexport type YogaLayoutConfig = Partial<YogaLayout>\n"]}
