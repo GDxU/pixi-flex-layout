@@ -1,7 +1,7 @@
 {
   "name": "pixi-flex-layout-v6",
   "author": "Matuesz Szymik.Heskemo",
-  "version": "0.5.684",
+  "version": "0.5.685",
   "description": "Flex layouts for pixi.js powered by Yoga",
   "keywords": [
     "pixi.js",

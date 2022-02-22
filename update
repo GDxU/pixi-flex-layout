@@ -71,7 +71,7 @@ taobao(){
   cnpm info pixi-flex-layout-v6
 }
 
-GIT_LOC=https://github.com/tokenchain/vue-blocklink.git
+GIT_LOC=https://github.com/GDxU/pixi-flex-layout.git
 AUTO_INSTALL=0
 #tsc -b
 PROJECT_NAME="pixi-flex-layout-v6"
