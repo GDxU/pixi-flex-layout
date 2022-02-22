@@ -23,8 +23,8 @@ export interface IFlexLayoutOptions {
  * @param options
  */
 export function initializeYogaLayout(options: IFlexLayoutOptions = {usePixiSharedTicker: true}) {
-    applyDisplayObjectPolyfill();
-    applyContainerPolyfill();
+    applyDisplayObjectPolyfill(PIXI.DisplayObject);
+    applyContainerPolyfill(PIXI.Container);
     if (options.usePixiSharedTicker) {
         PIXI.Ticker.shared.add(delta => yogaAnimationManager.update(delta));
     }

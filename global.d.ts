@@ -1,11 +1,11 @@
 // import {YogaLayout} from "./src";
-import {YogaLayout} from "pixi-flex-layout-v6"
+import {YogaLayout} from "./src"
 
 declare namespace GlobalMixins {
     /* interface Rectangle {
          fitY(rectangle: import('@pixi/math').Rectangle, width: number, height: number): import('@pixi/math').Rectangle;
      }*/
-    interface DisplayObject {
+    export interface DisplayObject {
         _yogaLayoutHash: number;
         _prevYogaLayoutHash: number;
         __yoga: YogaLayout;
@@ -28,13 +28,7 @@ declare namespace GlobalMixins {
         checkIfBoundingBoxChanged(): void;
     }
 
-    /*interface DisplayObject {
-        _yogaLayoutHash: number;
-        _prevYogaLayoutHash: number;
-        __yoga: YogaLayout;
-    }*/
-
-    interface Container {
+    export interface Container {
         /**
          * True to enable flex for direct children. See also: flexRecursive
          */

@@ -1,43 +1,42 @@
 import * as PIXI from "pixi.js"
+import {DisplayObject} from "@pixi/display";
 import {Transform} from "@pixi/math"
-import {DisplayObject} from "@pixi/display"
 import {YogaLayout} from "./YogaLayout";
 
 
 const NineSlicePlane = (<any>PIXI).NineSlicePlane || (<any>PIXI).mesh.NineSlicePlane;
 
-/*
-declare module PIXI {
-    export interface DisplayObject {
-        yoga: YogaLayout;
+interface IDisplayObject {
+    _yogaLayoutHash: number;
+    _prevYogaLayoutHash: number;
+    __yoga: YogaLayout;
+    yoga: YogaLayout;
+    /**
+     * Internal property for fast checking if object has yoga
+     */
+    __hasYoga: boolean;
+    _visible: boolean;
 
-        /!**
-         * Internal property for fast checking if object has yoga
-         *!/
-        __hasYoga: boolean;
+    /**
+     * Applies yoga layout to DisplayObject
+     */
+    updateYogaLayout(): void;
 
-        /!**
-         * Applies yoga layout to DisplayObject
-         *!/
-        updateYogaLayout(): void;
+    /**
+     * Checks boundaries of DisplayObject and emits NEED_LAYOUT_UPDATE if needed
+     */
+    checkIfBoundingBoxChanged(): void;
+}
 
-        /!**
-         * Checks boundaries of DisplayObject and emits NEED_LAYOUT_UPDATE if needed
-         *!/
-        checkIfBoundingBoxChanged(): void;
+
+export function applyDisplayObjectPolyfill(prototype: any) {
+    if (!prototype) {
+        console.log("@pixi/apply: mixin was called with empty parameter. Are you sure that?")
+        return
     }
+    const displayObjectProto = prototype.prototype as any & DisplayObject & Partial<IDisplayObject>
 
-    interface DisplayObject {
-        _yogaLayoutHash: number;
-        _prevYogaLayoutHash: number;
-        __yoga: YogaLayout;
-    }
-}*/
-
-
-export function applyDisplayObjectPolyfill(prototype: any = DisplayObject) {
-
-    Object.defineProperty(prototype, "yoga", {
+    Object.defineProperty(displayObjectProto, "yoga", {
         get(): boolean {
             if (!this.__yoga) {
                 this.__yoga = new YogaLayout(this);
@@ -50,7 +49,7 @@ export function applyDisplayObjectPolyfill(prototype: any = DisplayObject) {
         }
     });
 
-    Object.defineProperty(prototype, "visible", {
+    Object.defineProperty(displayObjectProto, "visible", {
         get(): boolean {
             return this._visible;
         },
@@ -62,8 +61,8 @@ export function applyDisplayObjectPolyfill(prototype: any = DisplayObject) {
         }
     });
 
-    const destroy = prototype.destroy;
-    prototype.destroy = function () {
+    const destroy = displayObjectProto.destroy;
+    displayObjectProto.destroy = function () {
         if (this.__hasYoga) {
             this.yoga.children = [];
             this.yoga.node.free();
@@ -74,7 +73,7 @@ export function applyDisplayObjectPolyfill(prototype: any = DisplayObject) {
         destroy.call(this);
     }
 
-    prototype.checkIfBoundingBoxChanged = function (this: DisplayObject) {
+    displayObjectProto.checkIfBoundingBoxChanged = function () {
         if ((this as any).updateText) {
             (this as any).updateText(true);
         }
@@ -130,7 +129,7 @@ export function applyDisplayObjectPolyfill(prototype: any = DisplayObject) {
         }
     }
 
-    prototype.updateYogaLayout = function (this: DisplayObject) {
+    displayObjectProto.updateYogaLayout = function () {
         this.__yoga.update();
         const updated = this.__yoga.willLayoutWillBeRecomputed();
         const layout = this.__yoga.getComputedLayout();

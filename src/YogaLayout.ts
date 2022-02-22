@@ -1,8 +1,11 @@
+/// <reference path="../global.d.ts" />
+
 import * as Yoga from "yoga-layout-prebuilt-low-memory";
 import * as PIXI from "pixi.js";
 import {YogaConstants} from "./YogaContants";
 import {YogaLayoutConfig} from "./YogaLayoutConfig";
 import {yogaAnimationManager} from "./YogaAnimationManager";
+import {GlobalMixins} from "../global";
 import YogaEdges = YogaConstants.YogaEdges;
 import ComputedLayout = YogaConstants.ComputedLayout;
 import FlexDirection = YogaConstants.FlexDirection;
@@ -11,6 +14,9 @@ import Align = YogaConstants.Align;
 import FlexWrap = YogaConstants.FlexWrap;
 import Display = YogaConstants.Display;
 import PositionType = YogaConstants.PositionType;
+import DisplayObject = GlobalMixins.DisplayObject;
+//import {GlobalMixins} from "../global";
+//import DisplayObject = GlobalMixins.DisplayObject;
 
 export type PixelsOrPercentage = number | string;
 export type YogaSize = PixelsOrPercentage | "pixi" | "auto";
@@ -27,6 +33,30 @@ export interface IAnimationState {
     easing: (progress: number) => number;
 }
 
+
+interface IDisplayObject {
+    _yogaLayoutHash: number;
+    _prevYogaLayoutHash: number;
+    __yoga: YogaLayout;
+    yoga: YogaLayout;
+    /**
+     * Internal property for fast checking if object has yoga
+     */
+    __hasYoga: boolean;
+    _visible: boolean;
+
+    /**
+     * Applies yoga layout to DisplayObject
+     */
+    updateYogaLayout(): void;
+
+    /**
+     * Checks boundaries of DisplayObject and emits NEED_LAYOUT_UPDATE if needed
+     */
+    checkIfBoundingBoxChanged(): void;
+}
+
+
 export interface IYogaAnimationConfig {
     time: number;
     easing: (progress: number) => number;
@@ -35,26 +65,7 @@ export interface IYogaAnimationConfig {
 
 }
 
-
-// Satsify the LoaderResource interface
-declare global {
-    // eslint-disable-next-line @typescript-eslint/no-namespace
-    namespace GlobalMixins {
-        abstract class DisplayObjectInternal extends PIXI.DisplayObject{
-            yoga: YogaLayout;
-            _yogaLayoutHash: number;
-            _prevYogaLayoutHash: number;
-            __yoga: YogaLayout;
-            __hasYoga: boolean;
-            updateYogaLayout(): void;
-            checkIfBoundingBoxChanged(): void;
-        }
-    }
-}
-
-
-type DisplayObject = GlobalMixins.DisplayObjectInternal;
-
+type NewDisplayObject = DisplayObject & Partial<IDisplayObject> & any;
 
 export class YogaLayout {
 
@@ -70,7 +81,7 @@ export class YogaLayout {
     public static readonly LAYOUT_UPDATED_EVENT = "LAYOUT_UPDATED_EVENT";
     public static readonly AFTER_LAYOUT_UPDATED_EVENT = "AFTER_LAYOUT_UPDATED_EVENT";
     public static readonly NEED_LAYOUT_UPDATE = "NEED_LAYOUT_UPDATE";
-    public readonly target: DisplayObject;
+    public readonly target: NewDisplayObject;
     public readonly node: Yoga.YogaNode;
     public children: YogaLayout[] = [];
     public parent?: YogaLayout;
@@ -120,33 +131,33 @@ export class YogaLayout {
     private _marginTop: number = 0;
     private _marginLeft: number = 0;
 
-    constructor(pixiObject: DisplayObject = new DisplayObject()) {
+    constructor(_disObj: NewDisplayObject) {
         this.node = Yoga.Node.create();
-        pixiObject.__hasYoga = true;
+        _disObj.__hasYoga = true;
         this.fillDefaults();
-        this.target = pixiObject;
+        this.target = _disObj;
         if ((<any>this.target)._texture) {
             this.width = this.height = "pixi";
         } else {
             this.width = this.height = "auto";
         }
 
-        if (pixiObject instanceof PIXI.Text || pixiObject instanceof PIXI.Sprite) {
+        if (_disObj instanceof PIXI.Text || _disObj instanceof PIXI.Sprite) {
             this.keepAspectRatio = true;
         }
 
-        if (pixiObject instanceof PIXI.Text) {
+        if (_disObj instanceof PIXI.Text) {
             this.aspectRatioMainDiemension = "width";
         }
 
         // broadcast event
-        pixiObject.on(YogaLayout.LAYOUT_UPDATED_EVENT as any, () => {
+        _disObj.on(YogaLayout.LAYOUT_UPDATED_EVENT as any, () => {
             this._lastLayout = this._cachedLayout;
             this._cachedLayout = undefined;
-            this.children.forEach(child => child.target.emit(YogaLayout.LAYOUT_UPDATED_EVENT))
+            (this.children as any & Partial<IDisplayObject> & PIXI.DisplayObject).forEach(child => child.target.emit(YogaLayout.LAYOUT_UPDATED_EVENT))
         })
 
-        pixiObject.on(YogaLayout.NEED_LAYOUT_UPDATE as any, () => {
+        _disObj.on(YogaLayout.NEED_LAYOUT_UPDATE as any, () => {
             // size change of this element wont change size/positions of its parent, so there is no need to update whole tree
             if (!this.parent /*|| (this.hasContantDeclaredSize && this.parent.width !== "auto" && this.parent.height !== "auto")*/) {
                 this._needUpdateAsRoot = true;
