@@ -1,10 +1,9 @@
 import * as Yoga from "yoga-layout-prebuilt-low-memory";
 import * as PIXI from "pixi.js";
-import { YogaConstants } from "./YogaContants";
-import { YogaLayoutConfig } from "./YogaLayoutConfig";
-import { yogaAnimationManager } from "./YogaAnimationManager";
+import {YogaConstants} from "./YogaContants";
+import {YogaLayoutConfig} from "./YogaLayoutConfig";
+import {yogaAnimationManager} from "./YogaAnimationManager";
 import YogaEdges = YogaConstants.YogaEdges;
-import DisplayObject = PIXI.DisplayObject;
 import ComputedLayout = YogaConstants.ComputedLayout;
 import FlexDirection = YogaConstants.FlexDirection;
 import JustifyContent = YogaConstants.JustifyContent;
@@ -15,7 +14,6 @@ import PositionType = YogaConstants.PositionType;
 
 export type PixelsOrPercentage = number | string;
 export type YogaSize = PixelsOrPercentage | "pixi" | "auto";
-
 
 export interface IAnimationState {
     fromX: number;
@@ -36,6 +34,27 @@ export interface IYogaAnimationConfig {
     shouldRunAnimation?(yoga: YogaLayout, prev: ComputedLayout, newLayout: ComputedLayout): boolean;
 
 }
+
+
+// Satsify the LoaderResource interface
+declare global {
+    // eslint-disable-next-line @typescript-eslint/no-namespace
+    namespace GlobalMixins {
+        abstract class DisplayObjectInternal extends PIXI.DisplayObject{
+            yoga: YogaLayout;
+            _yogaLayoutHash: number;
+            _prevYogaLayoutHash: number;
+            __yoga: YogaLayout;
+            __hasYoga: boolean;
+            updateYogaLayout(): void;
+            checkIfBoundingBoxChanged(): void;
+        }
+    }
+}
+
+
+type DisplayObject = GlobalMixins.DisplayObjectInternal;
+
 
 export class YogaLayout {
 

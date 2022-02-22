@@ -87,5 +87,5 @@ mod_package_json ".repository" "git@github.com:GDxU/pixi-flex-layout.git"
 mod_package_json ".homepage" "https://github.com/GDxU/pixi-flex-layout.git"
 echo "==== done ====="
 gitpush
-npmdeploy
-taobao
+#npmdeploy
+#taobao

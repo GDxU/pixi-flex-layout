@@ -1,23 +1,10 @@
 import * as PIXI from "pixi.js";
-import { YogaLayout } from "./YogaLayout";
-import Container = PIXI.Container;
+import {YogaLayout} from "./YogaLayout";
+import {GlobalMixins} from "../global";
+import Container = GlobalMixins.Container;
 
-declare module "pixi.js" {
-    export interface Container {
-        /**
-         * True to enable flex for direct children. See also: flexRecursive
-         */
-        flex: boolean;
 
-        /**
-         * True to enable flex for ALL children. See also: flex
-         */
-        flexRecursive: boolean;
-    }
-
-}
-
-export function applyContainerPolyfill(proto: any = Container.prototype) {
+export function applyContainerPolyfill(proto: any = Container) {
 
     Object.defineProperty(proto, "flex", {
         get(): boolean {

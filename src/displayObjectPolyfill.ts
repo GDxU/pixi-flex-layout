@@ -1,27 +1,29 @@
 import * as PIXI from "pixi.js"
-import { DisplayObject } from "pixi.js";
-import { YogaLayout } from "./YogaLayout";
-import TransformStatic = PIXI.TransformStatic;
+import {Transform} from "@pixi/math"
+import {DisplayObject} from "@pixi/display"
+import {YogaLayout} from "./YogaLayout";
+
 
 const NineSlicePlane = (<any>PIXI).NineSlicePlane || (<any>PIXI).mesh.NineSlicePlane;
 
-declare module "pixi.js" {
+/*
+declare module PIXI {
     export interface DisplayObject {
         yoga: YogaLayout;
 
-        /**
+        /!**
          * Internal property for fast checking if object has yoga
-         */
+         *!/
         __hasYoga: boolean;
 
-        /**
+        /!**
          * Applies yoga layout to DisplayObject
-         */
+         *!/
         updateYogaLayout(): void;
 
-        /**
+        /!**
          * Checks boundaries of DisplayObject and emits NEED_LAYOUT_UPDATE if needed
-         */
+         *!/
         checkIfBoundingBoxChanged(): void;
     }
 
@@ -30,10 +32,10 @@ declare module "pixi.js" {
         _prevYogaLayoutHash: number;
         __yoga: YogaLayout;
     }
-}
+}*/
 
 
-export function applyDisplayObjectPolyfill(prototype: any = DisplayObject.prototype) {
+export function applyDisplayObjectPolyfill(prototype: any = DisplayObject) {
 
     Object.defineProperty(prototype, "yoga", {
         get(): boolean {
@@ -134,7 +136,7 @@ export function applyDisplayObjectPolyfill(prototype: any = DisplayObject.protot
         const layout = this.__yoga.getComputedLayout();
 
         if (updated || this.__yoga.animationConfig || this.__yoga.rescaleToYoga) {
-            (this.transform as TransformStatic).position.set(layout.left, layout.top)
+            (this.transform as Transform).position.set(layout.left, layout.top)
 
             if (this.__yoga.rescaleToYoga) {
                 if (this.__yoga.keepAspectRatio && !isNaN((<any>this.__yoga)._height)) {
